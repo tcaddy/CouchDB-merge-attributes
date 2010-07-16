@@ -1,0 +1,15 @@
+When you update a document in CouchDB, you have to pass every attribute on update.  Even if the attribute values have not changed since the last update, you must pass them.  If you do not pass the attributes and their values, they are lost during update.
+
+This is a little annoying and cumbersome.  I want to have a way to tell CouchDB that we are just updating the attributes being passed, but that every other unchanged attribute should remain intact.  I call this 'merging the attributes' because I come from a Ruby on Rails background.  In Ruby, a Hash object has a built-in method called 'merge' that does just this.
+
+The way to achieve this is to add a design document with a attribute called 'validate_doc_update'.  We can add a javascript function that merges the attributes for use prior to save.
+
+The first thing we do is check to see if the user passed an optional attribute called '_merge' (and if the value is true).  If that attribute exists, we know that the user wants to merge attributes.  Otherwise, we would just do normal CouchDB behavior which is to delete all the old attributes that were not included in the update.
+
+In order to merge attributes, we need to iterate through every attribute of the oldDoc and compare it to the newDoc.  Attributes that begin with an underscore (_) are ignored.  If the oldDoc has an attribute that isn't present in the newDoc, we need to create the attribute in the newDoc and assign a value equal to the value of the attribute in the oldDoc.
+
+Right now, this DOES NOT WORK because the assignment of values from oldDoc to newDoc is not working.
+
+Specifically, this is the part of the javascript that does not work like I would like it to work:
+eval('newDoc.'+oldItem+'='+eval('oldDoc.'+oldItem));
+

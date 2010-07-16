@@ -1,0 +1,5 @@
+{
+   "_id": "_design/testdb",
+   "_rev": "1",
+   "validate_doc_update": "function(newDoc, oldDoc, userCtx) {   if(newDoc._merge) {var oldItem;for(oldItem in oldDoc){ if (oldItem.charAt(0)!='_') { if(!eval('newDoc.'+oldItem)) { eval('newDoc.'+oldItem+'='+eval('oldDoc.'+oldItem)); } } } } }"
+}
